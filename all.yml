@@ -1,0 +1,30 @@
+---
+- hosts: solr
+  become: yes
+  vars:
+    CURRENT:
+      host: grafana
+    HOST:
+      platform: amd64
+      subdomain: slac.stanford.edu
+      init: systemd
+    BOSUN_AGENT:
+      install: download
+      download_url: "https://github.com/bosun-monitor/bosun/releases/download/0.5.0/scollector-linux-{{ HOST.platform|lower }}"
+      upgrade: No
+      init: "{{ HOST.init }}"
+      server:
+        protocol: http
+        host: 134.79.196.80
+        port: 8070
+      hostname: "{{ CURRENT.host }}"
+      domain: "slac.stanford.edu"
+      hostgroup:  "DevOps"
+      common:
+        tags:
+          domain: "slac.stanford.edu"
+          hosttype: openstack
+      external_collectors:
+        dir: /usr/share/scollector/external_collectors
+  roles:
+    - { role: ansible-role-bosun_agent, tags: [ 'bosun_agent' ], _bosun_agent: "{{ BOSUN_AGENT }}" }
